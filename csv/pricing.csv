@@ -1,0 +1,35 @@
+Room Type,Multiple,Day of Week,Slot Time,Price
+Classic,1,1,00:00,4
+Classic,1,1,01:00,4
+Classic,1,1,02:00,4
+Classic,1,1,03:00,4
+Classic,1,1,04:00,4
+Classic,1,1,05:00,4
+Classic,1,1,06:00,4
+Classic,1,1,07:00,4
+Classic,1,1,08:00,4
+Classic,1,1,09:00,4
+Classic,1,1,10:00,4
+Classic,1,1,11:00,4
+Classic,1,1,12:00,4
+Classic,1,1,13:00,4
+Classic,1,1,14:00,4
+Classic,1,1,15:00,4
+Classic,1,1,16:00,6
+Classic,1,1,17:00,6
+Event Space,4,0,08:00,15
+Event Space,4,0,09:00,15
+Event Space,4,0,10:00,15
+Event Space,4,0,11:00,15
+Event Space,4,0,12:00,15
+Event Space,4,0,13:00,15
+Event Space,4,0,14:00,15
+Event Space,4,0,15:00,15
+Event Space,4,0,16:00,15
+Event Space,4,0,17:00,15
+Event Space,4,0,18:00,15
+Event Space,4,0,19:00,15
+Event Space,4,0,20:00,15
+Event Space,4,0,21:00,15
+Event Space,4,0,22:00,15
+Event Space,4,0,23:00,15

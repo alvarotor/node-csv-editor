@@ -1,0 +1,347 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+  <h1>CSV Pricing Editor</h1>
+  <div class="border">
+    <h5>Files</h5>
+    {% for csv in csvs %}
+      <p>
+        <a href='/prices/{{ csv }}'>{{ csv }}</a>
+        <button class="download" id="dow{{ csv }}">Download</button>
+        <button class="delete" id="del{{ csv }}">Delete</button>
+      </p>
+    {% endfor %}
+  </div>
+  <br />
+  <form
+    class="border"
+    id='uploadForm' 
+    action='/prices/upload' 
+    method='post' 
+    encType="multipart/form-data">
+      <h5>Upload a file</h5>
+      <br />
+      <input type="file" name="csvFile" />
+      <input type='submit' value='Upload a csv prices file' />
+  </form>
+
+  <br />
+  <form id="myBatch" class="border">
+    <h5>Save prices in range of hours</h5>
+    <div class="form-row align-items-center">
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <label for="propertiesInput">Properties &nbsp;</label>
+          <select class="form-control" id="propertiesInput">
+            {% for csv in csvs %}
+            <option>{{ csv }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <label for="roomsInput">Rooms &nbsp;</label>
+          <select class="form-control" id="roomsInput"></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row align-items-center">
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <label for="fromInput">From &nbsp;</label>
+          <select class="form-control" id="fromInput">
+            {% for i in 0..23 %}
+            <option>{{ i }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <label for="toInput">To &nbsp;</label>
+          <select class="form-control" id="toInput">
+            {% for i in 0..23 %}
+            <option>{{ i }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <button type="button" class="btn btn-default" id="peak">Peak</button>
+      </div>
+
+      <div class="col-auto my-1">
+        <button type="button" class="btn btn-default" id="peakOff">Off Peak</button>
+      </div>
+
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">&pound;</div>
+          </div>
+          <input type="text" class="form-control" id="inputPrice" placeholder="Price">
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </form>
+
+  <br />
+  <form id="myAddRoom" class="border">
+    <h5>Add a new pricing room in a property</h5>
+    <div class="form-row align-items-center">
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <label for="addRoomPropertyInput">Properties &nbsp;</label>
+          <select class="form-control" id="addRoomPropertyInput">
+            {% for csv in csvs %}
+            <option>{{ csv }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <label for="roomsInput">Room Name &nbsp;</label>
+          <input class="form-control" id="addRoomName"></input>
+        </div>
+      </div>
+      
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">&pound;</div>
+          </div>
+          <input type="text" class="form-control" id="addRoomPeakPrice" placeholder="Peak Price" />
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <div class="input-group-text">&pound;</div>
+          </div>
+          <input type="text" class="form-control" id="addRoomOffPeakPrice" placeholder="Off Peak Price" />
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <button type="submit" class="btn btn-primary">Add</button>
+      </div>
+    </div>
+  </form>
+
+  <br />
+  <form id="deleteRoom" class="border">
+    <h5>Delete a room in a property</h5>
+    <div class="form-row align-items-center">
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <label for="deletePropertyInput">Properties &nbsp;</label>
+          <select class="form-control" id="deletePropertyInput">
+            {% for csv in csvs %}
+            <option>{{ csv }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <div class="input-group">
+          <label for="roomsDelInput">Rooms &nbsp;</label>
+          <select class="form-control" id="roomsDelInput"></select>
+        </div>
+      </div>
+
+      <div class="col-auto my-1">
+        <button type="submit" class="btn btn-primary">Delete</button>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    var download = document.querySelectorAll('.download');
+    for (var i = 0; i < download.length; i++) {
+      download[i].addEventListener('click', function() {    
+        window.location = '/prices/download/' + this.id.substring(3);
+      });
+    };
+
+    var deleteThem = document.querySelectorAll('.delete');
+    for (var i = 0; i < deleteThem.length; i++) {
+      deleteThem[i].addEventListener('click', function() {  
+        var result = confirm(`Want to delete ${this.id.substring(3)}?`);
+        if (result) {
+          window.location = '/prices/delete/' + this.id.substring(3);
+        }  
+      });
+    };
+
+    document.getElementById("peak").addEventListener("click", function() {
+      document.getElementById("fromInput").value = 16;
+      document.getElementById("toInput").value = 0;
+    });
+
+    document.getElementById("peakOff").addEventListener("click", function() {
+      document.getElementById("fromInput").value = 0;
+      document.getElementById("toInput").value = 16;
+    });
+
+    document.getElementById("myBatch").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      var propertiesInput = document.getElementById("propertiesInput").value;
+      var roomsInput = document.getElementById("roomsInput").value;
+      var fromInput = document.getElementById("fromInput").value;
+      var toInput = document.getElementById("toInput").value;
+      var inputPrice = document.getElementById("inputPrice").value;
+
+      if (!inputPrice) {
+        alert("Must provide a price.");
+      } else {
+        axios.post('/prices/batch', {
+          propertiesInput,
+          roomsInput,
+          fromInput,
+          toInput,
+          inputPrice
+        })
+        .then(function (response) {
+          console.log(response.data);
+          if (response.data.success)
+            alert("Updated");
+          else
+            alert("Error on server.");
+        })
+        .catch(function (err) {
+          console.error(err);
+          console.log(err.response);
+          alert("Error on server.");
+        });
+      }
+
+    });
+
+    document.getElementById("myAddRoom").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      var addPropertyInput = document.getElementById("addRoomPropertyInput").value;
+      var roomInput = document.getElementById("addRoomName").value;
+      var inputOffPeakPrice = document.getElementById("addRoomOffPeakPrice").value;
+      var inputPeakPrice = document.getElementById("addRoomPeakPrice").value;
+
+      if (inputOffPeakPrice && inputPeakPrice && roomsInput) {
+        axios.post('/prices/addroom', {
+          addPropertyInput,
+          roomInput,
+          inputOffPeakPrice,
+          inputPeakPrice
+        })
+        .then(function (response) {
+          console.log(response.data);
+          if (response.data.success){
+            fillRooms(document.getElementById('propertiesInput').value, "roomsInput");
+            fillRooms(document.getElementById('deletePropertyInput').value, "roomsDelInput");
+            alert("Room added");
+          }
+          else
+            alert("Error on server.");
+        })
+        .catch(function (err) {
+          console.error(err);
+          console.log(err.response);
+          alert("Error on server.");
+        });
+      } else {
+        alert("Must provide a price.");
+      }
+
+    });
+
+    document.getElementById("deleteRoom").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      var propertyInput = document.getElementById("deletePropertyInput").value;
+      var roomInput = document.getElementById("roomsDelInput").value;
+
+      var result = confirm(`Want to delete ${roomInput}?`);
+      if (result) {
+        axios.post('/prices/deleteroom', {
+          propertyInput,
+          roomInput
+        })
+        .then(function (response) {
+          console.log(response.data);
+          if (response.data.success) {
+            const roomElem = document.getElementById("roomsDelInput");
+            for (var i = 0; i < roomElem.length; i++) {
+              if (roomElem.options[i].value == roomInput) {
+                roomElem.remove(i);
+              }
+            }
+            alert("Room deleted");
+          }
+          else
+            alert("Error on server.");
+        })
+        .catch(function (err) {
+          console.error(err);
+          console.log(err.response);
+          alert("Error on server.");
+        });
+      }
+    });
+      
+    function addEventHandler(elem, eventType, handler) {
+      if (elem.addEventListener)
+        elem.addEventListener (eventType, handler, false);
+      else if (elem.attachEvent)
+        elem.attachEvent ('on' + eventType, handler); 
+    }
+
+    function fillRooms(value, comboName) {
+      if (value)
+        axios.get('/prices/rooms/' + value)
+          .then(function (response) {
+            if (response.data.success) {
+              var combo = document.getElementById(comboName);
+              combo.innerHTML = "";
+              const rooms = response.data.rooms;
+              for (var room in rooms) {
+                var option = document.createElement("option");
+                option.text = rooms[room];
+                combo.add(option, false);
+              }
+            }
+          })
+          .catch(function (err) {
+            console.error(err);
+            console.log(err.response);
+          });
+    }
+
+    addEventHandler(document, 'DOMContentLoaded', function() {
+      addEventHandler(document.getElementById('propertiesInput'), 'change', function() {
+        fillRooms(this.value, "roomsInput");
+      });
+    });
+
+    addEventHandler(document, 'DOMContentLoaded', function() {
+      addEventHandler(document.getElementById('deletePropertyInput'), 'change', function() {
+        fillRooms(this.value, "roomsDelInput");
+      });
+    });
+
+    fillRooms(document.getElementById('propertiesInput').value, "roomsInput");
+    fillRooms(document.getElementById('deletePropertyInput').value, "roomsDelInput");
+  </script>
+{% endblock %}

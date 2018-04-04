@@ -1,0 +1,64 @@
+{% extends 'layout.twig' %}
+
+{% block body %}
+  <h1>CSV Pricing Editor</h1>
+  <h3>{{ property }}  <button id='index'>Back</button></h3>
+  {# <p>{{dump(lines)}}</p> #}
+  {% if lines is not empty %}
+  <div class="well">Loading...</div>
+  <table class="table table-striped invisible">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Room Type</th>
+        <th scope="col">Multiple</th>
+        <th scope="col">Day of Week</th>
+        <th scope="col">Slot Time</th>
+        <th scope="col">Price</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for line in lines %}
+      <tr>
+        <th scope="row">{{ line[0] }}</th>
+        <td>{{ line[1] }}</td>
+        <td>{{ line[2] }}</td>
+        <td>{{ line[3] }}</td>
+        <td>{{ line[4] }}</td>
+        <td><input type="text" value='{{ line[5] }}' id='value{{ line[0] }}'></input></td>
+        <td>
+          <button id='save{{ line[0] }}' class='save'>Save</button>
+        </td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan=7><button id='index2'>Back</button></td>
+      </tr>
+    </tbody>
+  </table>
+  {% endif %}
+  <script>
+    var sentQuery = false;
+    var saveLink = document.querySelectorAll('.save');
+    for (var i = 0; i < saveLink.length; i++) {
+      saveLink[i].addEventListener('click', function() {    
+        if (loading || sentQuery) {
+          alert("Page still processing csv files, please wait some seconds.");
+        }
+        else {
+          sentQuery = true;
+          const value = document.getElementById('value' + this.id.substring(4)).value;
+          window.location = '/prices/{{ property }}/'+ this.id.substring(4) + '/' + value;
+        }
+      });
+    }
+    
+    document.getElementById('index').addEventListener('click', function() {    
+      window.location = '/';
+    });
+    document.getElementById('index2').addEventListener('click', function() {    
+      window.location = '/';
+    });
+  </script>
+{% endblock %}
